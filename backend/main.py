@@ -132,9 +132,9 @@ def trouver_app_id_steam(nom_jeu: str) -> str:
         results = reponse.json()
         if results and len(results) > 0:
             return str(results[0].get("appid"))
-        return None
-    except:
-        return None
+        return ""
+    except (requests.RequestException, ValueError) as e:
+        return ""
 
 
 def recuperer_avis_utilisateurs(app_id: str) -> str:
@@ -156,7 +156,7 @@ def recuperer_avis_utilisateurs(app_id: str) -> str:
                 resultats += f"• **Total avis:** {total:,}"
                 return resultats
         return ""
-    except:
+    except (requests.RequestException, ValueError):
         return ""
 
 
@@ -196,7 +196,7 @@ def chercher_jeu_steam(nom_jeu: str) -> str:
         if description:
             resultats += f"• **Description:** {description}...\n"
         return resultats
-    except Exception as e:
+    except (requests.RequestException, ValueError, KeyError) as e:
         return f"⚠️ Erreur en cherchant le jeu: {str(e)[:50]}"
 
 
@@ -218,7 +218,7 @@ def chercher_mods_gamebanana(query: str) -> str:
                 nom = mod.get("name") or mod.get("_sName", "N/A")
                 resultats += f"\n• {nom}"
         return resultats
-    except Exception:
+    except (requests.RequestException, ValueError):
         return "📦 **Mods GameBanana (exemple):**\n• Skyrim Mod 1\n• Minecraft Mod 2\n• GTA V Mod 3\n\n(Remarque: L'API GameBanana a des limitations)"
 
 
@@ -259,6 +259,14 @@ class RoleResponse(BaseModel):
     description: str
     tags: list[str]
     greeting: str
+
+class CreateRoleRequest(BaseModel):
+    name: str
+    emoji: str
+    description: str = ""
+    tags: list[str] = []
+    greeting: str = "Bonjour !"
+    system_prompt: str = "Tu es un assistant IA."
 
 # ─────────────────────────────────────────────
 # État de l'application
@@ -305,7 +313,8 @@ def chat(message: Message):
     texte_lower = message.texte.lower()
     donnees_externes = ""
 
-    if any(w in texte_lower for w in ["steam", "jeu", "prix", "game", "détails", "combien", "coûte"]):
+    # Détection Steam : require "steam" ou "game" ET "prix" ou "coûte" ou "détails"
+    if any(w in texte_lower for w in ["steam", "game"]) and any(w in texte_lower for w in ["prix", "coûte", "détails", "combien"]):
         nom_jeu = message.texte
         for w in ["steam", "sur steam", "coûte", "prix", "détails", "parle-moi", "montre-moi", "cherche"]:
             nom_jeu = nom_jeu.lower().replace(w, "").strip()
@@ -314,7 +323,8 @@ def chat(message: Message):
             if not donnees_steam.startswith("❌"):
                 donnees_externes += f"[Données Steam]\n{donnees_steam}\n\n"
 
-    if "mod" in texte_lower and any(w in texte_lower for w in ["mod", "jeu"]):
+    # Détection GameBanana : require "mod" ET "gamebanana" ou "mod" + "telecharger"/"download"
+    if "mod" in texte_lower and any(w in texte_lower for w in ["gamebanana", "télécharger", "download"]):
         query = message.texte.replace("mod", "").replace("Mod", "").strip()[:50]
         donnees_externes += f"[Données GameBanana]\n{chercher_mods_gamebanana(query)}\n\n"
 
@@ -376,17 +386,17 @@ def get_roles():
     }
 
 @app.post("/roles")
-def create_role(role_data: dict):
+def create_role(role_data: CreateRoleRequest):
     """Crée un rôle personnalisé."""
     role_id = str(uuid.uuid4())[:8]
     roles_custom[role_id] = {
         "id": role_id,
-        "name": role_data.get("name", "Rôle personnalisé"),
-        "emoji": role_data.get("emoji", "🎭"),
-        "description": role_data.get("description", ""),
-        "tags": role_data.get("tags", []),
-        "greeting": role_data.get("greeting", "Bonjour !"),
-        "system_prompt": role_data.get("system_prompt", "Tu es un assistant IA.")
+        "name": role_data.name,
+        "emoji": role_data.emoji,
+        "description": role_data.description,
+        "tags": role_data.tags,
+        "greeting": role_data.greeting,
+        "system_prompt": role_data.system_prompt
     }
     return {"id": role_id, "role": roles_custom[role_id]}
 

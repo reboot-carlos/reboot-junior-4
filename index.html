@@ -7,6 +7,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 
   <style>
     /* ═════════════════════════════════════════════════════════════════════ */
@@ -75,6 +76,144 @@
 
     .role-change-pulse {
       animation: confetti-spin 0.6s ease-out;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* JEU EASTER EGG */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    .game-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .game-modal.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .game-container {
+      background: linear-gradient(135deg, #7c3aed, #3a86ff);
+      border-radius: 24px;
+      padding: 2rem;
+      text-align: center;
+      color: white;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      animation: slideInDown 0.4s ease;
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .game-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .game-emoji {
+      font-size: 3rem;
+      margin: 1rem 0;
+      animation: bounce 0.6s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .game-instructions {
+      font-size: 1rem;
+      margin: 1.5rem 0;
+      opacity: 0.9;
+    }
+
+    .game-area {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .game-button {
+      background: rgba(255, 255, 255, 0.3);
+      border: 3px solid white;
+      color: white;
+      font-size: 2rem;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.1s;
+      font-weight: 700;
+      font-family: 'Pacifico', cursive;
+    }
+
+    .game-button:hover {
+      background: rgba(255, 255, 255, 0.5);
+      transform: scale(1.1);
+    }
+
+    .game-button:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .game-score {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 1rem 0;
+    }
+
+    .game-timer {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0.5rem 0;
+    }
+
+    .game-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid white;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: all 0.2s;
+    }
+
+    .game-close:hover {
+      background: rgba(255, 255, 255, 0.4);
     }
 
     /* ═════════════════════════════════════════════════════════════════════ */
@@ -737,6 +876,23 @@
 </head>
 <body>
 
+  <!-- JEU EASTER EGG -->
+  <div class="game-modal" id="game-modal">
+    <div class="game-container">
+      <div class="game-title" id="game-title">Tap Master!</div>
+      <div class="game-emoji" id="game-emoji">🎮</div>
+      <div class="game-instructions" id="game-instructions">
+        Clique autant que possible en 10 secondes !
+      </div>
+      <div class="game-area">
+        <div class="game-timer" id="game-timer">10</div>
+        <div class="game-score" id="game-score">Score: 0</div>
+        <button class="game-button" id="game-button" onclick="incrementerScore()">TAP</button>
+      </div>
+      <button class="game-close" onclick="fermerJeu()">Fermer</button>
+    </div>
+  </div>
+
   <!-- BULLES DÉCORATIVES -->
   <div class="bulle" style="left:8%;  width:55px; height:55px; animation-duration:7s;  animation-delay:0s;"></div>
   <div class="bulle" style="left:22%; width:35px; height:35px; animation-duration:10s; animation-delay:1.5s;"></div>
@@ -753,8 +909,8 @@
     </div>
 
     <div class="sidebar-tabs">
-      <button class="tab-btn active" onclick="afficherTab('historique')">📜 Historique</button>
-      <button class="tab-btn" onclick="afficherTab('roles')">🎭 Rôles</button>
+      <button class="tab-btn active" onclick="afficherTab('historique', event)">📜 Historique</button>
+      <button class="tab-btn" onclick="afficherTab('roles', event)">🎭 Rôles</button>
     </div>
 
     <div class="sidebar-content" id="historique-list">
@@ -845,6 +1001,12 @@
     let roles = [];
     let activeTab = 'historique';
 
+    // Jeu Easter Egg
+    let cliqueAvatarCount = 0;
+    let scoreJeu = 0;
+    let gameTimer = null;
+    let gameActive = false;
+
     // ═══════════════════════════════════════════════════════════════════════
     // EMOJIS PAR RÔLE
     // ═══════════════════════════════════════════════════════════════════════
@@ -907,10 +1069,12 @@
     // ═══════════════════════════════════════════════════════════════════════
     // ONGLETS
     // ═══════════════════════════════════════════════════════════════════════
-    function afficherTab(tab) {
+    function afficherTab(tab, e) {
       activeTab = tab;
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      if (e && e.target) {
+        e.target.classList.add('active');
+      }
 
       document.getElementById('historique-list').style.display = tab === 'historique' ? 'flex' : 'none';
       document.getElementById('roles-list').style.display = tab === 'roles' ? 'flex' : 'none';
@@ -921,7 +1085,10 @@
     // ═══════════════════════════════════════════════════════════════════════
     async function chargerRoles() {
       try {
-        const reponse = await fetch(`${API_URL}/roles`, { timeout: 3000 });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const reponse = await fetch(`${API_URL}/roles`, { signal: controller.signal });
+        clearTimeout(timeoutId);
         if (!reponse.ok) throw new Error("Erreur API");
         const data = await reponse.json();
         roles = data.roles || [];
@@ -971,11 +1138,8 @@
           }
         ];
       }
+      // N'afficher que les rôles ici, pas de changement de rôle
       afficherRoles();
-      // Charger le premier rôle par défaut
-      if (roles.length > 0) {
-        changerRole(roles[0].id);
-      }
     }
 
     function afficherRoles() {
@@ -990,18 +1154,13 @@
         <div class="role-item ${roleActuel?.id === role.id ? 'active' : ''}" onclick="changerRole('${role.id}')">
           <div class="role-name">${role.emoji} ${role.name}</div>
           <div class="role-description">${role.description}</div>
-          <button class="item-delete" onclick="supprimerRole(event, '${role.id}')">🗑</button>
         </div>
       `).join('');
     }
 
-    async function changerRole(roleId) {
+    async function changerRole(roleId, askForNewConv = true) {
       const role = roles.find(r => r.id === roleId);
       if (role) {
-        // Animer le changement avec emojis du rôle
-        afficherConfetti(roleId);
-        animerAvatarChange();
-
         roleActuel = role;
         document.getElementById('bot-name').textContent = role.name;
         document.getElementById('bot-role').textContent = role.description;
@@ -1009,12 +1168,18 @@
         afficherRoles();
         mettreAJourBadges();
 
-        // CRÉER UNE NOUVELLE CONVERSATION quand on change de rôle
-        setTimeout(() => {
-          if (confirm(`Créer une nouvelle conversation avec ${role.name} ?`)) {
-            creerNouvelle();
-          }
-        }, 300);
+        // Animer le changement seulement si on demande une nouvelle conversation
+        if (askForNewConv) {
+          afficherConfetti(roleId);
+          animerAvatarChange();
+
+          // CRÉER UNE NOUVELLE CONVERSATION quand on change de rôle
+          setTimeout(() => {
+            if (confirm(`Créer une nouvelle conversation avec ${role.name} ?`)) {
+              creerNouvelle();
+            }
+          }, 300);
+        }
       }
     }
 
@@ -1170,7 +1335,8 @@
 
       const span = document.createElement("span");
       if (cote === "message-recu") {
-        span.innerHTML = marked.parse(texte);
+        const parsed = marked.parse(texte);
+        span.innerHTML = DOMPurify.sanitize(parsed);
       } else {
         span.textContent = texte;
       }
@@ -1268,7 +1434,10 @@
     });
 
     function supprimerMessage(bouton) {
-      const index = Array.from(document.getElementById("liste-messages").children).indexOf(bouton.parentElement);
+      const listeMessages = document.getElementById("liste-messages");
+      const elements = Array.from(listeMessages.children);
+      const index = elements.indexOf(bouton.parentElement);
+
       if (index >= 0 && index < historique.length) {
         historique.splice(index, 1);
 
@@ -1287,11 +1456,146 @@
       document.getElementById("compteur").textContent = total + " message(s)";
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // JEU EASTER EGG - TAP MASTER
+    // ═══════════════════════════════════════════════════════════════════════
+
+    const gameConfig = {
+      "assistant": {
+        title: "🤖 Bot Master",
+        emoji: "🤖",
+        instructions: "Clique sur le bouton autant que possible en 10 secondes !",
+        messages: ["Pas mal!", "Wow!", "Incroyable!", "Machine!", "Super!"]
+      },
+      "mentor": {
+        title: "📚 Quiz Master",
+        emoji: "📚",
+        instructions: "Entraîne ton cerveau ! Clique vite!",
+        messages: ["Excellent!", "Continuons!", "Bien joué!", "Bravo!", "C'est ça!"]
+      },
+      "creative": {
+        title: "🎨 Color Storm",
+        emoji: "🎨",
+        instructions: "Libère ta créativité ! Clique et crée!",
+        messages: ["Magnifique!", "Splendide!", "Artistique!", "Génial!", "Wow!"]
+      },
+      "analyst": {
+        title: "🔬 Logic Master",
+        emoji: "🔬",
+        instructions: "Analyse et clique rapidement!",
+        messages: ["Efficace!", "Parfait!", "Optimisé!", "Logique!", "Excellent!"]
+      },
+      "senior_dev": {
+        title: "👨‍💼 Code Rush",
+        emoji: "💻",
+        instructions: "Débugge aussi vite que possible!",
+        messages: ["C'est quoi ce code!", "Compilé!", "Déployé!", "Mégaforce!", "0 erreur!"]
+      }
+    };
+
+    function demarrerJeu() {
+      const roleId = roleActuel?.id || "assistant";
+      const config = gameConfig[roleId];
+
+      document.getElementById("game-title").textContent = config.title;
+      document.getElementById("game-emoji").textContent = config.emoji;
+      document.getElementById("game-instructions").textContent = config.instructions;
+      document.getElementById("game-score").textContent = "Score: 0";
+      document.getElementById("game-timer").textContent = "10";
+      document.getElementById("game-modal").classList.add("active");
+
+      scoreJeu = 0;
+      gameActive = true;
+      let timeLeft = 10;
+
+      document.getElementById("game-button").disabled = false;
+
+      // Décrémenter le timer
+      gameTimer = setInterval(() => {
+        timeLeft--;
+
+        // Arrêter à 0, pas avant
+        if (timeLeft <= 0) {
+          clearInterval(gameTimer);
+          gameTimer = null;
+          timeLeft = 0;
+          document.getElementById("game-timer").textContent = "0";
+          gameActive = false;
+          document.getElementById("game-button").disabled = true;
+
+          // Message de fin
+          const randomMsg = config.messages[Math.floor(Math.random() * config.messages.length)];
+          document.getElementById("game-instructions").textContent =
+            `${randomMsg} 🎉 Score final: ${scoreJeu}`;
+          return; // Sortir pour ne pas continuer
+        }
+
+        document.getElementById("game-timer").textContent = timeLeft;
+      }, 1000);
+    }
+
+    function incrementerScore() {
+      if (!gameActive) return;
+      scoreJeu++;
+      document.getElementById("game-score").textContent = `Score: ${scoreJeu}`;
+
+      // Effet visuel
+      const button = document.getElementById("game-button");
+      button.style.transform = "scale(0.9)";
+      setTimeout(() => {
+        button.style.transform = "scale(1)";
+      }, 100);
+
+      // Animation du score
+      afficherConfetti(roleActuel?.id || "assistant");
+    }
+
+    function fermerJeu() {
+      if (gameTimer) {
+        clearInterval(gameTimer);
+        gameTimer = null;
+      }
+      gameActive = false;
+      document.getElementById("game-modal").classList.remove("active");
+      cliqueAvatarCount = 0;
+    }
+
+    // Easter Egg - 3 clics sur l'avatar
+    function initialiserEasterEgg() {
+      const avatar = document.getElementById("avatar-ia");
+      avatar.style.cursor = "pointer";
+      avatar.addEventListener("click", function(e) {
+        e.stopPropagation();
+        cliqueAvatarCount++;
+
+        // Animation du clic
+        avatar.style.transform = `scale(${1 + cliqueAvatarCount * 0.05})`;
+        setTimeout(() => {
+          avatar.style.transform = "scale(1)";
+        }, 150);
+
+        if (cliqueAvatarCount >= 3) {
+          afficherConfetti(roleActuel?.id || "assistant");
+          setTimeout(() => {
+            demarrerJeu();
+            cliqueAvatarCount = 0;
+          }, 400);
+        }
+      });
+    }
+
     // Initialisation
     chargerRoles();
+    initialiserEasterEgg();
 
     // Attendre que les rôles soient chargés avant de charger les conversations
     setTimeout(() => {
+      // Afficher les rôles et charger le premier SANS demander de nouvelle conversation
+      afficherRoles();
+      if (roles.length > 0) {
+        changerRole(roles[0].id, false);
+      }
+
       chargerConversations();
       if (conversations.length === 0) {
         creerNouvelle();

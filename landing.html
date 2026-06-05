@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NovAI — Assistant IA Intelligent</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* RESET & GLOBAL */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: #1a1a1a;
+      background: #ffffff;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* ANIMATIONS */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    @keyframes gradientFlow {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(100vh) scale(0.5); opacity: 0; }
+      10%  { opacity: 0.2; }
+      90%  { opacity: 0.1; }
+      100% { transform: translateY(-100px) scale(1); opacity: 0; }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.5; }
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+      50%       { box-shadow: 0 0 40px rgba(58, 134, 255, 0.6); }
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* HEADER & NAVIGATION */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 1.2rem 2rem;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #3a86ff, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-family: 'Pacifico', cursive;
+      letter-spacing: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #555;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #3a86ff;
+    }
+
+    .cta-button {
+      background: linear-gradient(135deg, #3a86ff, #a855f7);
+      color: white;
+      padding: 0.8rem 1.8rem;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 4px 15px rgba(58, 134, 255, 0.3);
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(58, 134, 255, 0.5);
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* HERO SECTION */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 80px;
+      background: linear-gradient(-45deg, #7c3aed, #3a86ff, #06b6d4, #a855f7);
+      background-size: 400% 400%;
+      animation: gradientFlow 9s ease infinite;
+      overflow: hidden;
+    }
+
+    .bubbles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .bubble {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: floatUp linear infinite;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 800px;
+      color: white;
+      animation: slideInDown 0.8s ease;
+    }
+
+    .hero-emoji {
+      font-size: 6rem;
+      margin-bottom: 1rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      letter-spacing: -1px;
+    }
+
+    .hero-subtitle {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+      opacity: 0.95;
+      font-weight: 400;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: white;
+      color: #3a86ff;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      border: 2px solid white;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-3px);
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* FEATURES SECTION */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    .features {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2.8rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #3a86ff, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 4rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid #eee;
+      text-align: center;
+      transition: all 0.3s;
+      animation: slideInUp 0.6s ease;
+      cursor: pointer;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border-color: #3a86ff;
+    }
+
+    .feature-emoji {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 0.8rem;
+      color: #222;
+    }
+
+    .feature-card p {
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* ROLES SECTION */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    .roles {
+      padding: 6rem 2rem;
+      background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);
+    }
+
+    .roles .section-title {
+      margin-bottom: 1rem;
+    }
+
+    .roles-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .role-card {
+      background: white;
+      padding: 2.5rem 1.5rem;
+      border-radius: 16px;
+      border: 2px solid #f0f0f0;
+      text-align: center;
+      transition: all 0.3s;
+      animation: slideInUp 0.6s ease;
+    }
+
+    .role-card:hover {
+      border-color: #a855f7;
+      box-shadow: 0 15px 40px rgba(168, 85, 247, 0.15);
+      transform: translateY(-8px);
+    }
+
+    .role-emoji {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .role-card h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #222;
+    }
+
+    .role-card p {
+      color: #777;
+      font-size: 0.9rem;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* CTA SECTION */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    .cta-section {
+      padding: 6rem 2rem;
+      background: linear-gradient(135deg, #3a86ff, #a855f7);
+      color: white;
+      text-align: center;
+    }
+
+    .cta-section h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      opacity: 0.95;
+    }
+
+    .cta-section button {
+      background: white;
+      color: #3a86ff;
+      padding: 1.2rem 3rem;
+      border-radius: 50px;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .cta-section button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* FOOTER */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    footer {
+      background: #1a1a1a;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.9rem;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* RESPONSIVE */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .nav-links {
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+
+      .hero-emoji {
+        font-size: 4rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        padding: 0.8rem 1.8rem;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <nav>
+    <div class="logo">NovAI</div>
+    <div class="nav-links">
+      <a href="#features">Fonctionnalités</a>
+      <a href="#roles">Rôles</a>
+      <button class="cta-button" onclick="allerAuChat()">Commencer</button>
+    </div>
+  </nav>
+</header>
+
+<!-- HERO SECTION -->
+<section class="hero">
+  <div class="bubbles">
+    <div class="bubble" style="width: 80px; height: 80px; top: 10%; left: 10%; animation-duration: 7s; animation-delay: 0s;"></div>
+    <div class="bubble" style="width: 120px; height: 120px; top: 20%; right: 15%; animation-duration: 9s; animation-delay: 1s;"></div>
+    <div class="bubble" style="width: 60px; height: 60px; bottom: 20%; left: 20%; animation-duration: 8s; animation-delay: 2s;"></div>
+    <div class="bubble" style="width: 100px; height: 100px; bottom: 30%; right: 10%; animation-duration: 10s; animation-delay: 1.5s;"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-emoji">🤖</div>
+    <h1>Rencontre <br><span style="font-style: italic; font-family: 'Pacifico', cursive;">NovAI</span></h1>
+    <p class="hero-subtitle">
+      Un assistant IA intelligent avec <strong>5 rôles personnalisés</strong><br>
+      pour chaque situation. Chat fluide, historique persistant, design moderne.
+    </p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="allerAuChat()">🚀 Commencer Gratuitement</button>
+      <button class="btn-secondary" onclick="scrollTo('#features')">En Savoir Plus ↓</button>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES SECTION -->
+<section class="features" id="features">
+  <h2 class="section-title">✨ Fonctionnalités Incroyables</h2>
+  <p class="section-subtitle">Tout ce dont tu as besoin pour une expérience IA fluide</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-emoji">💬</div>
+      <h3>Chat Conversationnel</h3>
+      <p>Interface fluide avec support Markdown et suppression de messages. Une vraie conversation naturelle.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-emoji">📚</div>
+      <h3>Historique Intelligent</h3>
+      <p>Retrouve tes conversations passées en un clic. Chaque conversation est sauvegardée localement.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-emoji">🎭</div>
+      <h3>5 Rôles Différents</h3>
+      <p>Basculer entre Assistant, Mentor, Créatif, Analyste et Dev Senior. Chacun a sa personnalité.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-emoji">⚡</div>
+      <h3>Ultra Rapide</h3>
+      <p>Réponses instantanées avec Claude IA. Optimisé pour une latence minimale.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-emoji">🎮</div>
+      <h3>Easter Egg Game</h3>
+      <p>Clique 3 fois sur l'avatar pour déverrouiller un mini-jeu amusant. C'est secret ! 🤫</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-emoji">🎨</div>
+      <h3>Design Moderne</h3>
+      <p>Interface belle et responsive. Dégradés animés, animations fluides, interface intuitive.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ROLES SECTION -->
+<section class="roles" id="roles">
+  <h2 class="section-title">🎭 Choisis Ton Rôle</h2>
+  <p class="section-subtitle">Chaque rôle a sa personnalité et son expertise</p>
+
+  <div class="roles-grid">
+    <div class="role-card">
+      <div class="role-emoji">🤖</div>
+      <h3>NovAI</h3>
+      <p>Assistant conversationnel général, sympa et intelligent. Ton compagnon IA quotidien.</p>
+    </div>
+
+    <div class="role-card">
+      <div class="role-emoji">👨‍🏫</div>
+      <h3>Mentor IA</h3>
+      <p>Professeur patient qui explique les concepts progressivement. Parfait pour apprendre.</p>
+    </div>
+
+    <div class="role-card">
+      <div class="role-emoji">🎨</div>
+      <h3>Muse Créative</h3>
+      <p>Inspire ta créativité et brainstorming. Pour les projets innovants et originaux.</p>
+    </div>
+
+    <div class="role-card">
+      <div class="role-emoji">🔬</div>
+      <h3>Analyste Logique</h3>
+      <p>Expert en raisonnement et problèmes complexes. Analyse structurée et rigoureuse.</p>
+    </div>
+
+    <div class="role-card">
+      <div class="role-emoji">👨‍💼</div>
+      <h3>Dev Senior</h3>
+      <p>Développeur expérimenté pour code, architecture et best practices. Code review expert.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA SECTION -->
+<section class="cta-section">
+  <h2>Prêt à Découvrir NovAI ? 🚀</h2>
+  <p>Accès gratuit, sans inscription, sans limites. Commence maintenant !</p>
+  <button onclick="allerAuChat()">Ouvrir NovAI</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>NovAI — Assistant IA avec 5 rôles • Créé avec ❤️ par un Senior Developer</p>
+</footer>
+
+<script>
+  function allerAuChat() {
+    window.location.href = 'index.html';
+  }
+
+  function scrollTo(selector) {
+    const element = document.querySelector(selector);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+</script>
+
+</body>
+</html>
