@@ -1234,13 +1234,16 @@
           body: JSON.stringify(payload),
         });
 
-        if (!reponse.ok) throw new Error("Erreur API");
+        if (!reponse.ok) {
+          const errData = await reponse.json().catch(() => ({}));
+          throw new Error(errData.detail || `Erreur ${reponse.status}`);
+        }
         const data = await reponse.json();
         document.getElementById("indicateur-reflexion").style.display = "none";
         ajouterBulle(data.reponse, "message-recu");
-      } catch (_) {
+      } catch (err) {
         document.getElementById("indicateur-reflexion").style.display = "none";
-        ajouterBulle("⚠️ API non démarrée — lance : uvicorn main:app --reload (dans backend/)", "message-recu");
+        ajouterBulle(`⚠️ ${err.message}`, "message-recu");
       }
     }
 

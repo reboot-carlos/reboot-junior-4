@@ -15,10 +15,21 @@ import uuid
 # ─────────────────────────────────────────────
 load_dotenv()
 
-if not os.getenv("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY") == "sk-ant-REMPLACE_MOI":
-    raise RuntimeError("⚠️  Configure ta clé API dans le fichier .env !")
+_api_key = os.getenv("ANTHROPIC_API_KEY")
+_client: anthropic.Anthropic | None = None
 
-client = anthropic.Anthropic()
+
+def get_client() -> anthropic.Anthropic:
+    """Lazy client init — raises HTTP 503 with a helpful message if the key is missing."""
+    global _client
+    if _client is None:
+        if not _api_key or _api_key == "sk-ant-REMPLACE_MOI":
+            raise HTTPException(
+                status_code=503,
+                detail="ANTHROPIC_API_KEY non configurée. Ajoute-la dans Railway → Variables.",
+            )
+        _client = anthropic.Anthropic(api_key=_api_key)
+    return _client
 
 # ─────────────────────────────────────────────
 # RÔLES DISPONIBLES
@@ -311,7 +322,7 @@ def chat(message: Message):
             last = messages_enrichis[-1]
             messages_enrichis[-1] = {**last, "content": last["content"] + f"\n\n{donnees_externes}"}
 
-        reponse_claude = client.messages.create(
+        reponse_claude = get_client().messages.create(
             model="claude-opus-4-8",
             max_tokens=1024,
             system=[
