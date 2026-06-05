@@ -3,3 +3,5 @@ uvicorn
 anthropic
 python-dotenv
 requests
+httpx
+certifi

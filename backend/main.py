@@ -1,6 +1,8 @@
 import os
 import pathlib
 import anthropic
+import certifi
+import httpx
 import requests
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -28,7 +30,13 @@ def get_client() -> anthropic.Anthropic:
                 status_code=503,
                 detail="ANTHROPIC_API_KEY non configurée. Ajoute-la dans Railway → Variables.",
             )
-        _client = anthropic.Anthropic(api_key=_api_key)
+        _client = anthropic.Anthropic(
+            api_key=_api_key,
+            http_client=httpx.Client(
+                verify=certifi.where(),
+                timeout=httpx.Timeout(60.0),
+            ),
+        )
     return _client
 
 # ─────────────────────────────────────────────
