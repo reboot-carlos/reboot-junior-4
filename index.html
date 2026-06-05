@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NovAI — Assistant IA</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* ANIMATIONS */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    @keyframes gradientFlow {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(110vh) scale(0.5); opacity: 0; }
+      10%  { opacity: 0.25; }
+      90%  { opacity: 0.1; }
+      100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInSidebar {
+      from { opacity: 0; transform: translateX(-100px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(1.4); }
+    }
+
+    @keyframes rebond {
+      0%, 80%, 100% { transform: translateY(0); }
+      40%           { transform: translateY(-5px); }
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-100px) translateX(0) rotate(0deg) scale(1);
+        opacity: 1;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) translateX(var(--tx, 150px)) rotate(720deg) scale(0);
+        opacity: 0;
+      }
+    }
+
+    @keyframes confetti-spin {
+      0% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.2) rotate(180deg); }
+      100% { transform: scale(1) rotate(360deg); }
+    }
+
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      font-size: 2rem;
+      z-index: 999;
+      animation: confetti-fall 2.5s linear forwards;
+    }
+
+    .role-change-pulse {
+      animation: confetti-spin 0.6s ease-out;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* GLOBAL */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', Arial, sans-serif;
+      background: linear-gradient(-45deg, #7c3aed, #3a86ff, #06b6d4, #a855f7);
+      background-size: 400% 400%;
+      animation: gradientFlow 9s ease infinite;
+      color: #222;
+      display: flex;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bulle {
+      position: fixed;
+      bottom: -120px;
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 50%;
+      animation: floatUp linear infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* SIDEBAR */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    .sidebar {
+      width: 280px;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      z-index: 50;
+      animation: slideInSidebar 0.4s ease;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: white;
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.2rem;
+      margin: 0;
+      flex: 1;
+    }
+
+    .sidebar-header button {
+      background: linear-gradient(135deg, #3a86ff, #a855f7);
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.5);
+    }
+
+    .sidebar-tabs {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0 0.5rem 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 0.5rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #3a86ff, #a855f7);
+      color: white;
+      border-color: transparent;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .sidebar-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .sidebar-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .sidebar-content::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+
+    .history-item, .role-item {
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.9rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .history-item::before, .role-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: linear-gradient(135deg, #3a86ff, #a855f7);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .history-item:hover, .role-item:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .history-item:hover::before, .role-item:hover::before {
+      opacity: 1;
+    }
+
+    .history-item.active, .role-item.active {
+      background: rgba(168, 85, 247, 0.3);
+      border-color: rgba(168, 85, 247, 0.5);
+    }
+
+    .history-item.active::before, .role-item.active::before {
+      opacity: 1;
+    }
+
+    .history-title, .role-name {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-time {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .role-description {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .item-delete {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 59, 48, 0.7);
+      border: none;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.2s;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .history-item:hover .item-delete, .role-item:hover .item-delete {
+      opacity: 1;
+    }
+
+    .item-delete:hover {
+      background: rgba(255, 59, 48, 1);
+    }
+
+    .empty-state {
+      color: rgba(255, 255, 255, 0.6);
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.95rem;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* MAIN CONTAINER */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    .main-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      overflow: hidden;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* HEADER */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    header {
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: white;
+      width: 100%;
+      max-width: 700px;
+      padding: 1.8rem 2rem 1.4rem;
+      border-radius: 20px;
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    }
+
+    .header-coins {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .header-coins span {
+      position: absolute;
+      font-size: 1.3rem;
+      opacity: 0.35;
+    }
+
+    .header-coins span:nth-child(1) { top: 10px;  left: 14px; }
+    .header-coins span:nth-child(2) { top: 10px;  right: 14px; }
+    .header-coins span:nth-child(3) { bottom: 10px; left: 14px; }
+    .header-coins span:nth-child(4) { bottom: 10px; right: 14px; }
+
+    .avatar-ia {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3a86ff, #a855f7);
+      border: 3px solid rgba(255, 255, 255, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      margin: 0 auto 0.7rem;
+      box-shadow: 0 0 24px rgba(168, 85, 247, 0.5);
+    }
+
+    .header-badges {
+      display: flex;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 0.78rem;
+      letter-spacing: 0.03em;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.9rem;
+      font-weight: 600;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.02em;
+    }
+
+    header h2 {
+      margin: 0.4rem 0 0;
+      font-size: 1rem;
+      font-weight: 400;
+      opacity: 0.9;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .statut {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin: 0.4rem 0 0;
+      opacity: 0.9;
+      font-size: 0.92rem;
+    }
+
+    .point-vert {
+      width: 8px;
+      height: 8px;
+      background: #4ade80;
+      border-radius: 50%;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* ZONE MESSAGES */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    #zone-messages {
+      width: 100%;
+      max-width: 700px;
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 3px solid #3a86ff;
+      outline: 3px solid rgba(139, 92, 246, 0.55);
+      outline-offset: 4px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      margin-bottom: 1.5rem;
+      min-height: 300px;
+      max-height: 500px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .zone-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    #zone-messages h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    #bouton-nouvelle-conv {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #3a86ff, #a855f7);
+      color: white;
+      font-size: 1.4rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 12px rgba(168, 85, 247, 0.45);
+      transition: transform 0.2s, box-shadow 0.2s;
+      flex-shrink: 0;
+    }
+
+    #bouton-nouvelle-conv:hover {
+      transform: rotate(90deg) scale(1.15);
+      box-shadow: 0 5px 18px rgba(168, 85, 247, 0.65);
+    }
+
+    #liste-messages {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    #liste-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #liste-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #liste-messages::-webkit-scrollbar-thumb {
+      background: rgba(58, 134, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    #liste-messages li {
+      max-width: 85%;
+      padding: 0.65rem 1rem;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+      animation: slideIn 0.3s ease;
+      word-break: break-word;
+    }
+
+    .message-recu {
+      margin-right: auto;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: white;
+      border-radius: 18px 18px 18px 4px;
+    }
+
+    .message-envoye {
+      margin-left: auto;
+      color: white;
+      border-radius: 18px 18px 4px 18px;
+    }
+
+    .message-envoye:nth-child(3n + 1) {
+      background: linear-gradient(135deg, #3a86ff, #8b5cf6);
+    }
+
+    .message-envoye:nth-child(3n + 2) {
+      background: linear-gradient(135deg, #a855f7, #ec4899);
+    }
+
+    .message-envoye:nth-child(3n) {
+      background: linear-gradient(135deg, #06b6d4, #3a86ff);
+    }
+
+    #liste-messages li span {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .message-recu span p { margin: 0 0 0.4em; }
+    .message-recu span p:last-child { margin-bottom: 0; }
+    .message-recu span code { background: rgba(0, 0, 0, 0.18); border-radius: 4px; padding: 1px 5px; font-size: 0.88em; font-family: monospace; }
+    .message-recu span strong { font-weight: 700; }
+    .message-recu span em { font-style: italic; }
+
+    .bouton-supprimer {
+      background: rgba(255, 255, 255, 0.25);
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .message-envoye:hover .bouton-supprimer,
+    .message-recu:hover .bouton-supprimer {
+      opacity: 1;
+    }
+
+    .bouton-supprimer:hover {
+      background: rgba(229, 62, 62, 0.7);
+    }
+
+    #indicateur-reflexion {
+      display: none;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.8rem;
+      margin-bottom: 0.2rem;
+      color: #aaa;
+      font-size: 0.78rem;
+      font-weight: 400;
+    }
+
+    .points-reflexion {
+      display: flex;
+      gap: 3px;
+      align-items: flex-end;
+    }
+
+    .points-reflexion span {
+      width: 5px;
+      height: 5px;
+      background: #bbb;
+      border-radius: 50%;
+      animation: rebond 1.2s ease-in-out infinite;
+    }
+
+    .points-reflexion span:nth-child(1) { animation-delay: 0s; }
+    .points-reflexion span:nth-child(2) { animation-delay: 0.2s; }
+    .points-reflexion span:nth-child(3) { animation-delay: 0.4s; }
+
+    #compteur {
+      font-size: 0.9rem;
+      color: #888;
+      margin-top: 0.3rem;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* FORMULAIRE */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    #zone-formulaire {
+      width: 100%;
+      max-width: 700px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 20px;
+      padding: 1rem 1.2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 1;
+    }
+
+    #formulaire {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    #champ-texte {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      background: rgba(255, 255, 255, 0.88);
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+    #champ-texte:focus {
+      border-color: #a855f7;
+      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25);
+    }
+
+    #bouton-envoyer {
+      padding: 0.75rem 1.6rem;
+      background: linear-gradient(135deg, #3a86ff 0%, #a855f7 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.15rem;
+      font-family: 'Pacifico', cursive;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+      box-shadow: 0 4px 18px rgba(58, 134, 255, 0.45);
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    #bouton-envoyer:hover {
+      box-shadow: 0 8px 28px rgba(168, 85, 247, 0.7);
+    }
+
+    #bouton-envoyer:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 8px rgba(58, 134, 255, 0.3);
+    }
+
+    /* ═════════════════════════════════════════════════════════════════════ */
+    /* RESPONSIVE */
+    /* ═════════════════════════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .sidebar {
+        width: 250px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+        padding: 0;
+      }
+
+      .sidebar {
+        width: 100%;
+        max-height: 150px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        flex-direction: row;
+      }
+
+      .sidebar-header {
+        flex-direction: row;
+      }
+
+      .sidebar-content {
+        flex-direction: row;
+        gap: 0.5rem;
+        padding: 1rem;
+      }
+
+      .main-container {
+        padding: 1rem;
+        width: 100%;
+      }
+
+      header {
+        max-width: 100%;
+      }
+
+      #zone-messages {
+        max-width: 100%;
+        max-height: 400px;
+      }
+
+      #zone-formulaire {
+        max-width: 100%;
+      }
+
+      #liste-messages li {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BULLES DÉCORATIVES -->
+  <div class="bulle" style="left:8%;  width:55px; height:55px; animation-duration:7s;  animation-delay:0s;"></div>
+  <div class="bulle" style="left:22%; width:35px; height:35px; animation-duration:10s; animation-delay:1.5s;"></div>
+  <div class="bulle" style="left:48%; width:75px; height:75px; animation-duration:8s;  animation-delay:2.5s;"></div>
+  <div class="bulle" style="left:68%; width:28px; height:28px; animation-duration:9s;  animation-delay:0.8s;"></div>
+  <div class="bulle" style="left:83%; width:50px; height:50px; animation-duration:12s; animation-delay:3.5s;"></div>
+  <div class="bulle" style="left:35%; width:20px; height:20px; animation-duration:6s;  animation-delay:4s;"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>📋 Menu</h2>
+      <button onclick="effacerToutHistorique()" title="Effacer tout">🗑</button>
+    </div>
+
+    <div class="sidebar-tabs">
+      <button class="tab-btn active" onclick="afficherTab('historique')">📜 Historique</button>
+      <button class="tab-btn" onclick="afficherTab('roles')">🎭 Rôles</button>
+    </div>
+
+    <div class="sidebar-content" id="historique-list">
+      <div class="empty-state">Aucune conversation</div>
+    </div>
+
+    <div class="sidebar-content" id="roles-list" style="display: none;">
+      <div class="empty-state">Chargement des rôles...</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTAINER -->
+  <div class="main-container">
+    <!-- HEADER -->
+    <header>
+      <div class="header-coins">
+        <span>⚡</span>
+        <span>🔮</span>
+        <span>💡</span>
+        <span>🌐</span>
+      </div>
+
+      <div class="avatar-ia" id="avatar-ia">🤖</div>
+
+      <div class="header-badges" id="header-badges">
+        <span class="badge">✨ IA</span>
+        <span class="badge">🧠 Intelligent</span>
+        <span class="badge">🚀 Rapide</span>
+      </div>
+
+      <h1 id="bot-name">NovAI</h1>
+      <h2 id="bot-role">Assistant Conversationnel</h2>
+
+      <p class="statut">
+        <span class="point-vert"></span>
+        En ligne · Toujours disponible
+      </p>
+    </header>
+
+    <!-- ZONE MESSAGES -->
+    <div id="zone-messages">
+      <div class="zone-header">
+        <h2>💬 Conversation</h2>
+        <button id="bouton-nouvelle-conv" onclick="nouvelleConversation()" title="Nouvelle conversation">+</button>
+      </div>
+
+      <ul id="liste-messages">
+        <li class="message-recu">
+          <span>Bonjour ! Je suis NovAI, ton assistant intelligent. Comment puis-je t'aider aujourd'hui ? 🤖</span>
+          <button class="bouton-supprimer" onclick="supprimerMessage(this)">🗑</button>
+        </li>
+      </ul>
+
+      <div id="indicateur-reflexion">
+        <div class="points-reflexion">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        En train de réfléchir…
+      </div>
+
+      <p id="compteur">1 message</p>
+    </div>
+
+    <!-- FORMULAIRE -->
+    <div id="zone-formulaire">
+      <div id="formulaire">
+        <input
+          id="champ-texte"
+          type="text"
+          placeholder="Pose une question à NovAI..."
+        />
+        <button id="bouton-envoyer" onclick="envoyerMessage()">Envoyer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════════════
+    // CONFIGURATION
+    // ═══════════════════════════════════════════════════════════════════════
+    const API_URL = "";
+    let historique = [];
+    let conversationActuelle = null;
+    let conversations = [];
+    let roleActuel = null;
+    let roles = [];
+    let activeTab = 'historique';
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // EMOJIS PAR RÔLE
+    // ═══════════════════════════════════════════════════════════════════════
+    const emojisParRole = {
+      "assistant": ['🤖', '💬', '🧠', '⚡', '💡', '🚀', '🌐', '✨'],
+      "mentor": ['👨‍🏫', '📚', '✏️', '🎓', '📖', '🧑‍🎓', '🎯', '💪'],
+      "creative": ['🎨', '🖌️', '🎭', '💡', '🌈', '✨', '🎪', '🎬'],
+      "analyst": ['🔬', '📊', '🧮', '📈', '🔍', '🎯', '⚙️', '🔧'],
+      "senior_dev": ['👨‍💼', '💻', '🏗️', '🔧', '⚙️', '🚀', '📱', '🔐']
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // ANIMATIONS
+    // ═══════════════════════════════════════════════════════════════════════
+    function afficherConfetti(roleId = "assistant") {
+      // Récupérer les emojis du rôle, ou les emojis par défaut
+      const emojisRole = emojisParRole[roleId] || emojisParRole["assistant"];
+      const nbConfetti = 24;
+
+      for (let i = 0; i < nbConfetti; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+
+        // 70% d'emojis du rôle, 30% d'emojis génériques
+        if (Math.random() < 0.7) {
+          confetti.textContent = emojisRole[Math.floor(Math.random() * emojisRole.length)];
+        } else {
+          confetti.textContent = ['✨', '🌟', '💫', '⭐'][Math.floor(Math.random() * 4)];
+        }
+
+        // Position de départ aléatoire en haut
+        const startX = Math.random() * window.innerWidth;
+        confetti.style.left = startX + 'px';
+        confetti.style.top = '-50px';
+
+        // Déplacement horizontal aléatoire
+        const translateX = (Math.random() - 0.5) * 400;
+        confetti.style.setProperty('--tx', translateX + 'px');
+
+        // Animation avec délai progressif
+        confetti.style.animation = `confetti-fall ${2 + Math.random()}s ease-in forwards`;
+        confetti.style.animationDelay = i * 30 + 'ms';
+
+        document.body.appendChild(confetti);
+
+        // Nettoyer après l'animation
+        setTimeout(() => confetti.remove(), 3000);
+      }
+    }
+
+    function animerAvatarChange() {
+      const avatar = document.getElementById('avatar-ia');
+      avatar.classList.add('role-change-pulse');
+
+      setTimeout(() => {
+        avatar.classList.remove('role-change-pulse');
+      }, 600);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // ONGLETS
+    // ═══════════════════════════════════════════════════════════════════════
+    function afficherTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      document.getElementById('historique-list').style.display = tab === 'historique' ? 'flex' : 'none';
+      document.getElementById('roles-list').style.display = tab === 'roles' ? 'flex' : 'none';
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // GESTION DES RÔLES
+    // ═══════════════════════════════════════════════════════════════════════
+    async function chargerRoles() {
+      try {
+        const reponse = await fetch(`${API_URL}/roles`, { timeout: 3000 });
+        if (!reponse.ok) throw new Error("Erreur API");
+        const data = await reponse.json();
+        roles = data.roles || [];
+      } catch (err) {
+        console.warn("⚠️ Backend non disponible, utilisation des rôles par défaut");
+        // Utiliser les rôles par défaut du frontend
+        roles = [
+          {
+            id: "assistant",
+            name: "NovAI",
+            emoji: "🤖",
+            description: "Assistant Conversationnel",
+            tags: ["✨ IA", "🧠 Intelligent", "🚀 Rapide"],
+            greeting: "Comment puis-je t'aider aujourd'hui ?"
+          },
+          {
+            id: "mentor",
+            name: "Mentor IA",
+            emoji: "👨‍🏫",
+            description: "Professeur Particulier",
+            tags: ["📚 Pédagogue", "🎯 Structuré", "✏️ Patient"],
+            greeting: "Je suis là pour t'aider à apprendre."
+          },
+          {
+            id: "creative",
+            name: "Muse Créative",
+            emoji: "🎨",
+            description: "Brainstorming & Créativité",
+            tags: ["💡 Innovant", "🎭 Imaginatif", "✨ Inspirant"],
+            greeting: "Libérons ta créativité !"
+          },
+          {
+            id: "analyst",
+            name: "Analyste Logique",
+            emoji: "🔬",
+            description: "Analyse & Raisonnement",
+            tags: ["🧮 Logique", "📊 Analytique", "🎯 Précis"],
+            greeting: "Analysons cela ensemble."
+          },
+          {
+            id: "senior_dev",
+            name: "Dev Senior",
+            emoji: "👨‍💼",
+            description: "Expert en Architecture & Code",
+            tags: ["💻 Code", "🏗️ Architecture", "🎯 Expert"],
+            greeting: "Bienvenue ! Je suis un développeur senior. Comment puis-je t'aider avec ton projet ou architecture ?"
+          }
+        ];
+      }
+      afficherRoles();
+      // Charger le premier rôle par défaut
+      if (roles.length > 0) {
+        changerRole(roles[0].id);
+      }
+    }
+
+    function afficherRoles() {
+      const list = document.getElementById('roles-list');
+
+      if (roles.length === 0) {
+        list.innerHTML = '<div class="empty-state">Aucun rôle disponible</div>';
+        return;
+      }
+
+      list.innerHTML = roles.map(role => `
+        <div class="role-item ${roleActuel?.id === role.id ? 'active' : ''}" onclick="changerRole('${role.id}')">
+          <div class="role-name">${role.emoji} ${role.name}</div>
+          <div class="role-description">${role.description}</div>
+          <button class="item-delete" onclick="supprimerRole(event, '${role.id}')">🗑</button>
+        </div>
+      `).join('');
+    }
+
+    async function changerRole(roleId) {
+      const role = roles.find(r => r.id === roleId);
+      if (role) {
+        // Animer le changement avec emojis du rôle
+        afficherConfetti(roleId);
+        animerAvatarChange();
+
+        roleActuel = role;
+        document.getElementById('bot-name').textContent = role.name;
+        document.getElementById('bot-role').textContent = role.description;
+        document.getElementById('avatar-ia').textContent = role.emoji;
+        afficherRoles();
+        mettreAJourBadges();
+
+        // CRÉER UNE NOUVELLE CONVERSATION quand on change de rôle
+        setTimeout(() => {
+          if (confirm(`Créer une nouvelle conversation avec ${role.name} ?`)) {
+            creerNouvelle();
+          }
+        }, 300);
+      }
+    }
+
+    function mettreAJourBadges() {
+      if (!roleActuel) return;
+      const badges = document.getElementById('header-badges');
+      badges.innerHTML = roleActuel.tags.map(tag => `<span class="badge">${tag}</span>`).join('');
+    }
+
+    async function supprimerRole(e, roleId) {
+      e.stopPropagation();
+      try {
+        await fetch(`${API_URL}/roles/${roleId}`, { method: 'DELETE' });
+        chargerRoles();
+      } catch (err) {
+        console.error("Erreur suppression rôle:", err);
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // GESTION HISTORIQUE & CONVERSATIONS
+    // ═══════════════════════════════════════════════════════════════════════
+
+    function sauvegarderConversations() {
+      localStorage.setItem('novai_conversations', JSON.stringify(conversations));
+    }
+
+    function chargerConversations() {
+      const data = localStorage.getItem('novai_conversations');
+      conversations = data ? JSON.parse(data) : [];
+      afficherHistorique();
+    }
+
+    function creerNouvelle() {
+      // Utiliser le rôle actuel pour le greeting
+      const welcomeMsg = roleActuel
+        ? roleActuel.greeting
+        : "Comment puis-je t'aider aujourd'hui ?";
+
+      conversationActuelle = {
+        id: Date.now(),
+        titre: "Nouvelle conversation",
+        messages: [{ role: "assistant", content: welcomeMsg }],
+        date: new Date().toLocaleString('fr-FR'),
+        roleId: roleActuel?.id || "assistant"
+      };
+      conversations.unshift(conversationActuelle);
+      historique = [{ role: "assistant", content: welcomeMsg }];
+      sauvegarderConversations();
+      afficherHistorique();
+      afficherConversationActuelle();
+    }
+
+    function afficherHistorique() {
+      const list = document.getElementById('historique-list');
+
+      if (conversations.length === 0) {
+        list.innerHTML = '<div class="empty-state">Aucune conversation</div>';
+        return;
+      }
+
+      list.innerHTML = conversations.map((conv, idx) => `
+        <div class="history-item ${conversationActuelle?.id === conv.id ? 'active' : ''}" onclick="chargerConversation(${conv.id})">
+          <div class="history-title">${conv.titre}</div>
+          <div class="history-time">${conv.date}</div>
+          <button class="item-delete" onclick="supprimerConversation(event, ${conv.id})">🗑</button>
+        </div>
+      `).join('');
+    }
+
+    function chargerConversation(id) {
+      conversationActuelle = conversations.find(c => c.id === id);
+      if (conversationActuelle) {
+        // Charger l'historique de cette conversation UNIQUEMENT
+        historique = JSON.parse(JSON.stringify(conversationActuelle.messages));
+
+        // Charger le rôle de cette conversation
+        if (conversationActuelle.roleId) {
+          const roleData = roles.find(r => r.id === conversationActuelle.roleId);
+          if (roleData) {
+            roleActuel = roleData;
+            mettreAJourBadges();
+            document.getElementById('bot-name').textContent = roleData.name;
+            document.getElementById('bot-role').textContent = roleData.description;
+            document.getElementById('avatar-ia').textContent = roleData.emoji;
+          }
+        }
+
+        afficherHistorique();
+        afficherConversationActuelle();
+      }
+    }
+
+    function supprimerConversation(e, id) {
+      e.stopPropagation();
+      conversations = conversations.filter(c => c.id !== id);
+      sauvegarderConversations();
+      if (conversationActuelle?.id === id) {
+        if (conversations.length > 0) {
+          chargerConversation(conversations[0].id);
+        } else {
+          creerNouvelle();
+        }
+      } else {
+        afficherHistorique();
+      }
+    }
+
+    function effacerToutHistorique() {
+      if (confirm("Êtes-vous sûr de vouloir effacer TOUT l'historique ? Cette action est irréversible.")) {
+        // Effacer les conversations locales
+        conversations = [];
+        localStorage.removeItem('novai_conversations');
+        historique = [];
+
+        // Effacer l'historique du backend aussi
+        try {
+          fetch(`${API_URL}/historique`, { method: 'DELETE' });
+        } catch (err) {
+          console.log("Backend pas disponible pour effacer l'historique");
+        }
+
+        // Créer une nouvelle conversation vierge
+        conversationActuelle = null;
+        creerNouvelle();
+      }
+    }
+
+    function afficherConversationActuelle() {
+      // Vider complètement la liste des messages
+      const listeMsgs = document.getElementById('liste-messages');
+      listeMsgs.innerHTML = '';
+
+      // Réafficher tous les messages de la conversation actuelle
+      if (historique && historique.length > 0) {
+        historique.forEach(msg => {
+          ajouterBulle(msg.content, msg.role === "assistant" ? "message-recu" : "message-envoye", false);
+        });
+      }
+
+      mettreAJourCompteur();
+      // Scroller vers le bas
+      listeMsgs.scrollTop = listeMsgs.scrollHeight;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // CHAT PRINCIPAL
+    // ═══════════════════════════════════════════════════════════════════════
+
+    function ajouterBulle(texte, cote, save = true) {
+      const li = document.createElement("li");
+      li.className = cote;
+
+      const span = document.createElement("span");
+      if (cote === "message-recu") {
+        span.innerHTML = marked.parse(texte);
+      } else {
+        span.textContent = texte;
+      }
+
+      const bouton = document.createElement("button");
+      bouton.textContent = "🗑";
+      bouton.className = "bouton-supprimer";
+      bouton.onclick = function () { supprimerMessage(this); };
+
+      li.appendChild(span);
+      li.appendChild(bouton);
+      document.getElementById("liste-messages").appendChild(li);
+
+      if (save) {
+        const newMsg = {
+          role: cote === "message-recu" ? "assistant" : "user",
+          content: texte
+        };
+        historique.push(newMsg);
+
+        if (conversationActuelle) {
+          // Copier l'historique dans la conversation
+          conversationActuelle.messages = JSON.parse(JSON.stringify(historique));
+
+          // Générer le titre si c'est le premier message utilisateur
+          if (historique.length === 2) {
+            conversationActuelle.titre = texte.substring(0, 40) + (texte.length > 40 ? "..." : "");
+          }
+
+          // Sauvegarder
+          sauvegarderConversations();
+          afficherHistorique();
+        }
+      }
+
+      mettreAJourCompteur();
+      document.getElementById("liste-messages").scrollTop = document.getElementById("liste-messages").scrollHeight;
+    }
+
+    async function envoyerMessage() {
+      const champ = document.getElementById("champ-texte");
+      const texte = champ.value.trim();
+      if (!texte) return;
+
+      ajouterBulle(texte, "message-envoye");
+      champ.value = "";
+      document.getElementById("indicateur-reflexion").style.display = "flex";
+
+      try {
+        // Envoyer le rôle de LA CONVERSATION ACTUELLE, pas du rôle actuel
+        const roleIdConversation = conversationActuelle?.roleId || roleActuel?.id || "assistant";
+
+        const payload = {
+          texte: texte,
+          role_id: roleIdConversation
+        };
+
+        const reponse = await fetch(`${API_URL}/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!reponse.ok) throw new Error("Erreur API");
+        const data = await reponse.json();
+        document.getElementById("indicateur-reflexion").style.display = "none";
+        ajouterBulle(data.reponse, "message-recu");
+      } catch (_) {
+        document.getElementById("indicateur-reflexion").style.display = "none";
+        ajouterBulle("⚠️ API non démarrée — lance : uvicorn main:app --reload (dans backend/)", "message-recu");
+      }
+    }
+
+    function nouvelleConversation() {
+      if (confirm("Créer une nouvelle conversation ?")) {
+        // Animation avec emojis du rôle actuel
+        const roleIdActuel = roleActuel?.id || "assistant";
+        afficherConfetti(roleIdActuel);
+        animerAvatarChange();
+
+        setTimeout(() => {
+          creerNouvelle();
+        }, 300);
+      }
+    }
+
+    document.getElementById("champ-texte").addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        envoyerMessage();
+      }
+    });
+
+    function supprimerMessage(bouton) {
+      const index = Array.from(document.getElementById("liste-messages").children).indexOf(bouton.parentElement);
+      if (index >= 0 && index < historique.length) {
+        historique.splice(index, 1);
+
+        if (conversationActuelle) {
+          conversationActuelle.messages = JSON.parse(JSON.stringify(historique));
+          sauvegarderConversations();
+        }
+      }
+
+      bouton.parentElement.remove();
+      mettreAJourCompteur();
+    }
+
+    function mettreAJourCompteur() {
+      const total = document.getElementById("liste-messages").querySelectorAll("li").length;
+      document.getElementById("compteur").textContent = total + " message(s)";
+    }
+
+    // Initialisation
+    chargerRoles();
+
+    // Attendre que les rôles soient chargés avant de charger les conversations
+    setTimeout(() => {
+      chargerConversations();
+      if (conversations.length === 0) {
+        creerNouvelle();
+      } else {
+        chargerConversation(conversations[0].id);
+      }
+
+      // Message de démarrage si backend pas dispo
+      if (roles.length === 0) {
+        document.getElementById('roles-list').innerHTML =
+          '<div class="empty-state">⚠️ Backend non démarré<br><br>Lance: <code>uvicorn main:app --reload</code></div>';
+      }
+    }, 100);
+  </script>
+
+</body>
+</html>

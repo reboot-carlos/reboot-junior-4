@@ -1,0 +1,12 @@
+.git/
+.gitignore
+.claude/
+backend/.env
+backend/__pycache__/
+backend/start.sh
+backend/start.bat
+backend/test_api.py
+__pycache__/
+*.pyc
+*.pyo
+*.md
