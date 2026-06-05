@@ -293,7 +293,11 @@ def health():
     return {"message": "NovAI API est en ligne 🤖", "version": "3.0.0", "model": "claude-opus-4-8"}
 
 @app.get("/")
-def serve_index():
+def serve_landing():
+    return FileResponse(STATIC_DIR / "landing.html")
+
+@app.get("/chat")
+def serve_chat():
     return FileResponse(STATIC_DIR / "index.html")
 
 @app.get("/home")
